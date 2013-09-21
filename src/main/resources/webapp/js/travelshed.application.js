@@ -12,6 +12,30 @@ var APP = (function() {
 
     var requestModel = GTT.createRequestModel();
 
+    var schoolMarkers = ( function() {
+      console.log("in school markers: " + schools);
+      L.geoJson([schools], {
+        style: function (feature) {
+            return feature.properties && feature.properties.style;
+          },
+        onEachFeature: onEachFeature,
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 4,
+            fillColor:  "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8,
+            zIndexOffset: -1000,
+            riseOnHover: true
+          });
+        }
+      }).addTo(map).bringToBack();
+      
+    })();
+
+
     var transitShedLayer = (function() {
         var mapLayer = null;
         var opacity = 0.9;
@@ -59,11 +83,11 @@ var APP = (function() {
                         breaks: GTT.Constants.BREAKS,
                         palette: GTT.Constants.COLORS,
                         attribution: 'Azavea'
-		    });
+		    })
                 }
 		
 		mapLayer.setOpacity(opacity);
-		mapLayer.addTo(map);
+		mapLayer.addTo(map).bringToFront();
 		map.lc.addOverlay(mapLayer, "Travel Times");
             }
         };
@@ -76,7 +100,7 @@ var APP = (function() {
                 if(mapLayer) { 
                     mapLayer.setOpacity(opacity); 
                 }
-            },
+            }
         };
     })();
     
@@ -171,9 +195,14 @@ var APP = (function() {
                 requestModel.setLatLng(lat,lng);
             }
         }
-    })();
+    }); // ()
 
     function onEachFeature(feature, layer) {
+      layer.on('click', function(e) {
+        console.log("Clicked on school.");
+        var latLng = feature.geometry.coordinates;
+        requestModel.setLatLng( latLng[1], latLng[0] );
+      });
       var schoolName = feature.properties.FACIL_NAME;
       var gradeLevel = feature.properties.GRADE_LEVE;
       var institType = feature.properties.INSTIT_TYP;
@@ -192,6 +221,7 @@ var APP = (function() {
 
       layer.bindPopup(popupContent);
     }
+
 
 
     var schoolMarkers = ( function() {
