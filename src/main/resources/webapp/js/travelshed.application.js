@@ -12,28 +12,7 @@ var APP = (function() {
 
     var requestModel = GTT.createRequestModel();
 
-    var schoolMarkers = ( function() {
-      console.log("in school markers: " + schools);
-      L.geoJson([schools], {
-        style: function (feature) {
-            return feature.properties && feature.properties.style;
-          },
-        onEachFeature: onEachFeature,
-        pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, {
-            radius: 4,
-            fillColor:  "#ff7800",
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-            zIndexOffset: -1000,
-            riseOnHover: true
-          });
-        }
-      }).addTo(map).bringToBack();
-      
-    })();
+
 
 
     var transitShedLayer = (function() {
