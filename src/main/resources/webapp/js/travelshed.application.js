@@ -12,7 +12,6 @@ var APP = (function() {
 
     var requestModel = GTT.createRequestModel();
 
-
     var schoolMarkers = ( function() {
       console.log("in school markers: " + schools);
       L.geoJson([schools], {
