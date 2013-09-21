@@ -174,8 +174,17 @@ var APP = (function() {
     })();
 
     function onEachFeature(feature, layer) {
-      var popupContent = "<p>I started out as a GeoJSON " +
-          feature.geometry.type + ", but now I'm a Leaflet vector!</p>";
+      var schoolName = feature.properties.FACIL_NAME;
+      var gradeLevel = feature.properties.GRADE_LEVE;
+      var institType = feature.properties.INSTIT_TYP;
+      var enrollment = feature.properties.ENROLLMENT;
+      var active = feature.properties.ACTIVE;
+
+      var popupContent = "<p><h4>" + schoolName + "</h4></p>" + 
+                         "<p>Grade Level: " + gradeLevel + "</p>" + 
+                         "<p>Institution Type: " + institType + "</p>" +
+                         "<p>Enrollment: " + enrollment + "</p>" +
+                         "<p>Active (??) : " + active + "</p>";
 
       if (feature.properties && feature.properties.popupContent) {
         popupContent += feature.properties.popupContent;
