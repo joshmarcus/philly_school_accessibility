@@ -195,6 +195,12 @@ var APP = (function() {
 
 
     var schoolMarkers = ( function() {
+      //  Uses custom icons for schools
+
+      var mySchoolMarkers = L.markerClusterGroup({
+          spiderfyOnMaxZoom: true,
+          zoomToBoundsOnClick: false
+      });
       console.log("in school markers: " + schools);
       L.geoJson([schools], {
         style: function (feature) {
@@ -202,17 +208,22 @@ var APP = (function() {
           },
         onEachFeature: onEachFeature,
         pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, {
-            radius: 8,
-            fillColor:  "#ff7800",
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-          });
+            //  Create an icon:
+            var myIcon = L.icon({
+                iconUrl: getSchoolIconUrl(feature),
+                iconAnchor: [22, 94],
+                popupAnchor: [-3, -76]
+            });
+            //  Create a marker with our custom icon:
+            var myMarker = L.marker(latlng,{
+                    icon: myIcon
+                }
+            );
+            mySchoolMarkers.addLayer(myMarker);
+            return myMarker;
         }
-      }).addTo(map)
-      
+      });
+      map.addLayer(mySchoolMarkers);
     })();
 
     return {
@@ -242,3 +253,19 @@ var APP = (function() {
 $(document).ready(function() {
     APP.onReady();
 });
+
+function getSchoolIconUrl(feature){
+    /*
+    Returns the appropriate school icon URL(closed/open) based on the number of enrollments in that school:
+    **/
+    if(feature.properties.ENROLLMENT>0)
+    {
+        //  School is open. Use the proper icon
+        return 'img/open_school_icon.png';
+    }
+    else
+    {
+        // School is closed. Use the proper icon
+        return 'img/closed_school_icon.png';
+    }
+}
