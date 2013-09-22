@@ -166,8 +166,13 @@ var APP = (function() {
         var lat = GTT.Constants.START_LAT;
         var lng = GTT.Constants.START_LNG;
 
+        var startIcon = L.AwesomeMarkers.icon({
+            color : 'green'
+        })
+
         var marker = L.marker([lat,lng], {
-            draggable: true 
+            draggable: true,
+            icon : startIcon
         }).addTo(map);
         
         marker.on('dragend', function(e) { 
@@ -175,6 +180,8 @@ var APP = (function() {
             lng = marker.getLatLng().lng;
             requestModel.setLatLng(lat,lng);
         } );
+
+        marker.bindPopup("This is your starting location").openPopup();
 
         return {
             getMarker : function() { return marker; },
@@ -193,15 +200,17 @@ var APP = (function() {
         var lat = GTT.Constants.END_LAT;
         var lng = GTT.Constants.END_LNG;
 
-        var redMarker = L.AwesomeMarkers.icon({
-            color: 'red'
+        var endMarker = L.AwesomeMarkers.icon({
+            color : 'red'
         })
 
         var marker = L.marker([lat,lng], {
             draggable: true,
-            icon: redMarker
+            icon: endMarker
         }).addTo(map);
-        
+
+        marker.bindPopup("This is your destination");
+
         marker.on('dragend', function(e) { 
             lat = marker.getLatLng().lat;
             lng = marker.getLatLng().lng;
@@ -240,6 +249,67 @@ var APP = (function() {
             }
         }
     };
+
+    /*Added by Kinan to support showing the school nodes, hopefully!*/
+    function onEachFeature(feature, layer) {
+        layer.on('click', function(e) {
+            console.log("Clicked on school.");
+            var latLng = feature.geometry.coordinates;
+            requestModel.setLatLng( latLng[1], latLng[0] );
+        });
+        var schoolName = feature.properties.FACIL_NAME;
+        var gradeLevel = feature.properties.GRADE_LEVE;
+        var institType = feature.properties.INSTIT_TYP;
+        var enrollment = feature.properties.ENROLLMENT;
+        var active = feature.properties.ACTIVE;
+
+        var popupContent = "<p><h4>" + schoolName + "</h4></p>" +
+            "<p>Grade Level: " + gradeLevel + "</p>" +
+            "<p>Institution Type: " + institType + "</p>" +
+            "<p>Enrollment: " + enrollment + "</p>" +
+            "<p>Active (??) : " + active + "</p>";
+
+        if (feature.properties && feature.properties.popupContent) {
+            popupContent += feature.properties.popupContent;
+        }
+
+        layer.bindPopup(popupContent);
+    }
+
+
+
+    var schoolMarkers = ( function() {
+        //  Uses custom icons for schools
+
+        var mySchoolMarkers = L.markerClusterGroup({
+            spiderfyOnMaxZoom: true,
+            zoomToBoundsOnClick: false
+        });
+        console.log("in school markers: " + schools);
+        L.geoJson([schools], {
+            style: function (feature) {
+                return feature.properties && feature.properties.style;
+            },
+            onEachFeature: onEachFeature,
+            pointToLayer: function (feature, latlng) {
+                //  Create an icon:
+                var myIcon = L.icon({
+                    iconUrl: getSchoolIconUrl(feature),
+                    iconAnchor: [22, 94],
+                    popupAnchor: [-3, -76]
+                });
+                //  Create a marker with our custom icon:
+                var myMarker = L.marker(latlng,{
+                        icon: myIcon
+                    }
+                );
+                mySchoolMarkers.addLayer(myMarker);
+                return myMarker;
+            }
+        });
+        map.addLayer(mySchoolMarkers);
+    })();
+    /*End roadwork*/
 
     return {
         onLoadGoogleApiCallback : GTT.Geocoder.onLoadGoogleApiCallback,
@@ -280,3 +350,19 @@ var APP = (function() {
 $(document).ready(function() {
     APP.onReady();
 });
+
+function getSchoolIconUrl(feature){
+    /*
+     Returns the appropriate school icon URL(closed/open) based on the number of enrollments in that school:
+     **/
+    if(feature.properties.ENROLLMENT>0)
+    {
+        //  School is open. Use the proper icon
+        return 'img/open_school_icon.png';
+    }
+    else
+    {
+        // School is closed. Use the proper icon
+        return 'img/closed_school_icon.png';
+    }
+}
