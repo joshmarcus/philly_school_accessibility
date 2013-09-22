@@ -208,7 +208,7 @@ var APP = (function() {
 
       var mySchoolMarkers = L.markerClusterGroup({
           spiderfyOnMaxZoom: true,
-          zoomToBoundsOnClick: false
+          zoomToBoundsOnClick: true
       });
       console.log("in school markers: " + schools);
       L.geoJson([schools], {
