@@ -74,7 +74,7 @@ var GTT = (function() {
             "Blank" : getLayer(layers.mapBox.worldBlank,layers.mapBox.attrib)
         };
 
-        var defaultLayer = baseLayers["Toner"];
+        var defaultLayer = baseLayers["Azavea"];
 
         return {
             addTo : function(m) {
