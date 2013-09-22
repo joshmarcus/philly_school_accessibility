@@ -191,8 +191,15 @@ var APP = (function() {
       var popupContent = "<p><h4>" + schoolName + "</h4></p>" + 
                          "<p>Grade Level: " + gradeLevel + "</p>" + 
                          "<p>Institution Type: " + institType + "</p>" +
-                         "<p>Enrollment: " + enrollment + "</p>" +
-                         "<p>Active (??) : " + active + "</p>";
+                         "<p>Enrollment: " + enrollment + "</p>";
+
+      if(isSchoolOpen(feature)){
+          popupContent += "<p>This school is open &nbsp; <img src='img/smileyface.png'/></p>" ;
+      }
+      else
+      {
+          popupContent += "<p>This school is closed &nbsp; <img src='img/sadface.png'/></p>" ;
+      }
 
       if (feature.properties && feature.properties.popupContent) {
         popupContent += feature.properties.popupContent;
@@ -277,4 +284,16 @@ function getSchoolIconUrl(feature){
         // School is closed. Use the proper icon
         return 'img/closed_school_icon.png';
     }
+}
+
+function isSchoolOpen(feature){
+    /*
+     * Checks if the passed school/feature has open enrollments and returns a boolean to the caller:
+     * True: the school is open
+     * False: the school is closed
+     * */
+    if(feature.properties.ENROLLMENT>0)
+        return true;
+    else
+        return false;
 }
